@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anticoagulant Reversal in GI Haemorrhage</title>
+<meta name="description" content="An interactive, referenced walkthrough of the decision-making algorithm for anticoagulant reversal in gastrointestinal haemorrhage.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=1">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+</head>
+<body>
+
+<header class="masthead">
+  <h1>Decision-Making Algorithm for Anticoagulant Reversal in Gastrointestinal Haemorrhage</h1>
+  <p class="masthead__byline">
+    <strong>Dr. Özgür Karcıoğlu</strong> &amp; <strong>Dr. Satuk Buğra Han Bozatlı</strong>
+    &nbsp;— select any box below to read the reasoning and sources behind that step.
+  </p>
+  <p class="masthead__disclaimer">
+    Educational / academic reference tool, not a substitute for institutional protocol or
+    clinical judgement at the bedside. Drug doses shown reflect the algorithm as authored;
+    verify against current local protocol before clinical use.
+  </p>
+</header>
+
+<main>
+  <div class="workstation">
+    <section class="scope" aria-label="Interactive flowchart">
+      <p class="scope__hint">Scroll sideways and pinch to zoom — this is the full diagram, same as on desktop.</p>
+      <div class="flow" id="flow">
+        <svg class="edges" id="edges" aria-hidden="true"></svg>
+        <!-- nodes are rendered here by app.js from content.js -->
+      </div>
+    </section>
+
+    <aside class="readout" id="readout" aria-live="polite">
+      <button class="readout__close" id="readoutClose" type="button">Close ✕</button>
+      <div class="readout__idle" id="readoutIdle">
+        Select any box in the diagram to see what it means, why the protocol
+        calls for it, and the sources behind it.
+      </div>
+      <div id="readoutContent" hidden></div>
+    </aside>
+  </div>
+
+  <div class="scope-backdrop" id="backdrop"></div>
+
+  <section class="references" aria-label="References">
+    <details id="references">
+      <summary>References <span class="count" id="refCount"></span></summary>
+      <ol id="referencesList"></ol>
+    </details>
+  </section>
+
+  <p class="abbrev-note">
+    4F-PCC, four-factor prothrombin complex concentrate; aPCC, activated prothrombin complex
+    concentrate; AIMS65, albumin &lt;3.0 g/dL, INR &gt;1.5, altered mental status, systolic
+    blood pressure &le;90 mmHg, age &ge;65 years; CT, computed tomography; DOAC, direct oral
+    anticoagulant; FBC, full blood count; FFP, fresh frozen plasma; GBS, Glasgow-Blatchford
+    score; GIB, gastrointestinal bleeding; INR, international normalised ratio; IV,
+    intravenous; LMWH, low-molecular-weight heparin; PPI, proton pump inhibitor; UFH,
+    unfractionated heparin; VKA, vitamin K antagonist.
+  </p>
+</main>
+
+<footer class="site">
+  <a href="https://satbuhan.github.io/clinical-algorithm-atlas/" target="_blank" rel="noopener">← Clinical Algorithm Atlas</a>
+  <span>Built as a companion to the other protocols, same methodology.</span>
+  <a href="https://satbuhan.github.io/aortic-dissection-protocol/" target="_blank" rel="noopener">Acute aortic dissection protocol →</a>
+  <a href="https://satbuhan.github.io/agitation-delirium-protocol/" target="_blank" rel="noopener">Butyrophenone selection — agitation &amp; delirium →</a>
+  <a href="https://satbuhan.github.io/influenza-antiviral-protocol/" target="_blank" rel="noopener">Influenza antiviral selection →</a>
+  <a href="https://satbuhan.github.io/nsaid-pain-protocol/" target="_blank" rel="noopener">Dexketoprofen vs ibuprofen →</a>
+  <a href="https://github.com/satbuhan" target="_blank" rel="noopener">github.com/satbuhan</a>
+  <span>CC BY-NC-SA 4.0</span>
+</footer>
+
+<script src="assets/content.js?v=1"></script>
+<script src="assets/app.js?v=1"></script>
+</body>
+</html>
