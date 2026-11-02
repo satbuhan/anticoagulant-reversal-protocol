@@ -421,3 +421,44 @@ const GLOSSARY = [
   { match: "HAS-BLED", full: "HAS-BLED score", def: "A bleeding-risk score (hypertension, abnormal renal/liver function, stroke history, bleeding history or predisposition, labile INR, elderly age, drugs/alcohol) used alongside a thromboembolic-risk score to individualise the decision to resume anticoagulation." },
   { match: "CHA₂DS₂-VASc", full: "CHA₂DS₂-VASc score", def: "A thromboembolic-risk score for atrial fibrillation (congestive heart failure, hypertension, age ≥75, diabetes, prior stroke/TIA/thromboembolism, vascular disease, age 65–74, sex category), used alongside a bleeding-risk score to individualise anticoagulant-resumption timing." }
 ];
+
+// Clinical agent (drug) names to visually emphasise wherever they appear —
+// in the diagram boxes themselves and in the readout panel's prose. This
+// is a rendering-only concern (app.js wraps each match in a styled span at
+// render time); it never touches label/sub, which stay byte-exact as
+// authored. Matching is case-insensitive and whole-word, longest name
+// first.
+//
+// Deliberately excluded (already a GLOSSARY term with its own
+// click-to-expand definition — adding it here too would be redundant, same
+// pattern as "esketamine" in ketamine-head-injury-protocol): 4F-PCC, aPCC,
+// FFP, idarucizumab, andexanet alfa (including its bare "andexanet" short
+// form — in this tool it only ever appears as the full "andexanet alfa"
+// phrase inside a diagram box, so a bare-word entry would split-bold just
+// "Andexanet" there), UFH, LMWH, PPI.
+//
+// "Protamine" IS included, unlike andexanet, even though "protamine
+// sulfate" is a GLOSSARY term: the bare word "protamine" (no "sulfate")
+// is the dominant form used throughout — it's the ONLY form that appears
+// in the diagram box text, and 10 of its 12 occurrences overall drop
+// "sulfate" — so excluding it would leave this reversal pathway's central
+// drug unstyled everywhere it actually appears in the diagram.
+//
+// "VKA" is not emphasised: it is a drug-class abbreviation (parallel to
+// "DOAC", which the GLOSSARY does cover), not a specific agent name, so it
+// stays outside AGENTS the same way DOAC does. "Crystalloid" and "blood
+// products" are likewise generic categories, not named agents.
+// Added at Dr. Özgür Karcıoğlu's request, 2026-11-02 — see METHODOLOGY.md.
+const AGENTS = [
+  "Vitamin K",
+  "Warfarin",
+  "Dabigatran",
+  "Apixaban",
+  "Rivaroxaban",
+  "Edoxaban",
+  "Heparin",
+  "Protamine",
+  "Enoxaparin",
+  "Activated charcoal",
+  "Three-factor PCC"
+];
