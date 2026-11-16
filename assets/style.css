@@ -448,6 +448,27 @@ a { color: var(--accent); }
   cursor: pointer;
 }
 .calc-item input { margin-top: 0.2rem; flex: none; }
+
+/* A mutually-exclusive set of options within one calculator (e.g.
+   CHA₂DS₂-VASc's age bands) — same visual language as a plain checkbox
+   item, just grouped under its own label with a thin rule separating it
+   from neighbouring items. */
+.calc-radio-group {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.calc-radio-group legend {
+  padding: 0 0 0.1rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.calc-item--radio { padding-left: 0.3rem; }
 .calc-total {
   margin: 0.65rem 0 0;
   font-family: var(--font-sans);

@@ -429,6 +429,17 @@ emphasis" above):
    `.calc-flag` — all built from existing tokens (`--accent`, `--paper`,
    `--rule-strong`, etc.), no new colors introduced.
 
+Added 2026-11-16 (second calculator, CHA₂DS₂-VASc): an item can carry
+`"kind": "radio"` with its own `options: [{label, points}, ...]` instead
+of a plain `points` value, for a mutually-exclusive set within one
+calculator — CHA₂DS₂-VASc's age bands (<65 / 65-74 / ≥75) are
+alternatives, never cumulative, so they can't be three independent
+checkboxes without risking a double-counted total. Rendered as a
+`<fieldset>`/`<legend>` with radio inputs sharing one unique `name` per
+group. An item with no `kind` still defaults to the original checkbox
+behaviour, so every calculator shipped before this one needed no
+migration.
+
 An item flagged `needsAuthor: true` in the calculator's JSON (e.g.
 HAS-BLED's renal and alcohol cutoffs — the original 2010 source and its
 later secondary citations disagree on `>` vs `≥`) renders with a trailing

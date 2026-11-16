@@ -239,20 +239,52 @@
     const box = document.createElement("div");
     box.className = "calc-box";
 
+    // Most items are independent checkboxes (one point value each, any
+    // combination may be checked). An item with kind: "radio" is instead
+    // a mutually-exclusive set of options with its own point values (e.g.
+    // CHA₂DS₂-VASc's age bands: <65 / 65-74 / ≥75 are alternatives, never
+    // cumulative) — rendered as a labelled radio group sharing one unique
+    // `name`, so at most one option in that group can contribute points.
+    // Plain items with no `kind` default to the checkbox behaviour, so
+    // existing calculator entries never need migrating.
     const list = document.createElement("div");
     list.className = "calc-items";
-    calc.items.forEach((item, i) => {
-      const row = document.createElement("label");
-      row.className = "calc-item";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.dataset.points = String(item.points);
-      cb.id = "calc-" + calc.id + "-" + i;
-      row.appendChild(cb);
-      const span = document.createElement("span");
-      span.textContent = item.label + (item.needsAuthor ? " *" : "");
-      row.appendChild(span);
-      list.appendChild(row);
+    let idx = 0;
+    calc.items.forEach((item) => {
+      if (item.kind === "radio") {
+        const fs = document.createElement("fieldset");
+        fs.className = "calc-radio-group";
+        const legend = document.createElement("legend");
+        legend.textContent = item.label + (item.needsAuthor ? " *" : "");
+        fs.appendChild(legend);
+        const groupName = "calc-" + calc.id + "-group-" + idx++;
+        item.options.forEach((opt) => {
+          const row = document.createElement("label");
+          row.className = "calc-item calc-item--radio";
+          const rb = document.createElement("input");
+          rb.type = "radio";
+          rb.name = groupName;
+          rb.dataset.points = String(opt.points);
+          row.appendChild(rb);
+          const span = document.createElement("span");
+          span.textContent = opt.label;
+          row.appendChild(span);
+          fs.appendChild(row);
+        });
+        list.appendChild(fs);
+      } else {
+        const row = document.createElement("label");
+        row.className = "calc-item";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.dataset.points = String(item.points);
+        cb.id = "calc-" + calc.id + "-" + idx++;
+        row.appendChild(cb);
+        const span = document.createElement("span");
+        span.textContent = item.label + (item.needsAuthor ? " *" : "");
+        row.appendChild(span);
+        list.appendChild(row);
+      }
     });
     box.appendChild(list);
 
@@ -260,8 +292,8 @@
     total.className = "calc-total";
     function updateTotal() {
       let sum = 0;
-      list.querySelectorAll("input[type=checkbox]:checked").forEach((cb) => {
-        sum += Number(cb.dataset.points) || 0;
+      list.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked").forEach((el) => {
+        sum += Number(el.dataset.points) || 0;
       });
       total.textContent = "Total: " + sum + (calc.maxScore ? " / " + calc.maxScore : "");
     }
