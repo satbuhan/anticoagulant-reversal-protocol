@@ -385,6 +385,64 @@ then a Playwright pass confirming `.node .agent-name` and
 console/page errors, and a visual screenshot review — agent names should
 read as clearly emphasised without the diagram looking cluttered.
 
+### Calculators (keyword-triggered, reusable across the whole atlas)
+
+Added 2026-11-16, starting with HAS-BLED. A calculator is never built
+bespoke into one tool — it's defined once in the hub's
+`assets/calculators.json` and activates automatically in any tool whose
+own `GLOSSARY` already defines a matching term (via that calculator's
+`aliases` list). This tool's `GLOSSARY` entry for `HAS-BLED` (added when
+the cross-atlas concept index was built, long before any calculator
+existed) needed **zero changes** to gain a calculator — the trigger
+appeared the moment the hub's index gained a `has-bled` entry whose
+`aliases` includes `"HAS-BLED"`.
+
+Three pieces, same in every tool (parallel to "Agent (drug) name
+emphasis" above):
+
+1. **Hub repo, not this one**: `assets/calculators.json` — see its own
+   README section ("Cross-atlas calculator index") for the schema and
+   the citation-verification requirement before adding an entry.
+2. **app.js**: a second fetch, parallel to the existing `CONCEPTS` one,
+   loading `CALCULATORS` from the hub (best-effort, non-blocking, same
+   contract). `findCalculatorForTerm(matchText)` checks a GLOSSARY
+   term's `match` string against every calculator's `aliases`
+   (case-insensitive). `linkify()`'s existing GLOSSARY-match branch
+   calls `calculatorHtml(g.match)` and appends its result (a trigger
+   button + an empty, hidden mount `<div>`) inside the same
+   `.term-def` panel glossary terms already render into — no new UI
+   surface, reuses the existing click-to-expand definition panel.
+   `renderCalculatorInto()` dispatches on `calc.type` (`additive-score`
+   is the only type so far; add a new branch here, never bespoke
+   per-calculator code, when a different kind is needed) and
+   `renderAdditiveScoreCalculator()` builds a live checkbox list with a
+   running total purely from the calculator's own JSON data — adding a
+   second additive-score calculator later needs no app.js change at
+   all. **No persistence anywhere**: closing a calculator (clicking its
+   trigger again) wipes its mount's `innerHTML`; reopening always
+   builds fresh. This is deliberate, same reasoning as the rest of the
+   atlas's no-backend stance plus a clinical-safety one specific to
+   this feature — a stale checked box surviving from one patient to the
+   next would silently misscore the second patient.
+3. **style.css**: `.calc-trigger`, `.calc-mount`, `.calc-box`,
+   `.calc-items`/`.calc-item`, `.calc-total`, `.calc-note`/`.calc-source`,
+   `.calc-flag` — all built from existing tokens (`--accent`, `--paper`,
+   `--rule-strong`, etc.), no new colors introduced.
+
+An item flagged `needsAuthor: true` in the calculator's JSON (e.g.
+HAS-BLED's renal and alcohol cutoffs — the original 2010 source and its
+later secondary citations disagree on `>` vs `≥`) renders with a trailing
+`*` and a footnote asking for author confirmation, the same spirit as the
+per-node `needsAuthor` flag but a separate, item-level mechanism — don't
+conflate the two in future edits.
+
+QA this like any other change: `node --check` on `app.js`, then a
+Playwright pass opening the node whose text mentions the calculator's
+term, confirming the trigger button appears, clicking it shows the
+checkbox list, checking/unchecking updates the total live, clicking the
+trigger again hides and clears it, and zero console/page errors —
+desktop and mobile both.
+
 ### External verification (an alternative to in-session WebSearch)
 
 The in-session, Claude-does-every-search approach above works but doesn't
