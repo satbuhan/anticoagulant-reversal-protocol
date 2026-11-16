@@ -366,9 +366,17 @@
       } else {
         const g = best.g;
         const label = g.full ? g.full[0].toUpperCase() + g.full.slice(1) : "";
+        // A calculator-enabled term gets a small badge right on the button
+        // itself, inline in the running text — the trigger to actually use
+        // it still lives inside the def panel (calculatorHtml below), but
+        // the badge is what makes the opportunity visible before a reader
+        // ever clicks anything, rather than a surprise found only after
+        // opening the definition.
+        const hasCalc = !!findCalculatorForTerm(g.match);
         result +=
           '<button type="button" class="term" aria-expanded="false">' +
           best.text +
+          (hasCalc ? ' <span class="term-calc-badge" aria-hidden="true">🧮</span>' : "") +
           "</button>" +
           '<span class="term-def" hidden>' +
           (g.full ? "<strong>" + escapeHtml(label) + "</strong> — " : "") +

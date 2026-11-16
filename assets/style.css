@@ -340,6 +340,15 @@ a { color: var(--accent); }
 }
 .term:hover, .term:focus-visible { background: var(--accent-wash); }
 .term[aria-expanded="true"] { background: var(--accent-wash); border-bottom-style: solid; }
+/* badge on a glossary term that also has a calculator — the visibility
+   signal itself; the actual trigger stays inside .term-def (see
+   .calc-trigger below), this just tells a reader it's worth opening */
+.term-calc-badge {
+  font-size: 0.82em;
+  margin-left: 0.12em;
+  line-height: 1;
+  vertical-align: -0.05em;
+}
 .term-def {
   display: block;
   font-family: var(--font-sans);
