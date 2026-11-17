@@ -157,178 +157,6 @@
     return '<p class="term-crosslinks">Also covered in: ' + links + "</p>";
   }
 
-  /* ---- cross-atlas calculator index ----
-     A second, independently-fetched shared file at the hub:
-     assets/calculators.json. Unlike concepts.json (generated per-tool from
-     GLOSSARY defs), this one is hand-authored and tool-agnostic — a flat
-     registry of calculator definitions, each carrying its own `aliases`
-     (exact GLOSSARY `match` strings, case-insensitive, that should trigger
-     it). Any tool whose own GLOSSARY already has a matching term lights up
-     a calculator automatically — no edit to that tool's content.js, no
-     opt-in flag anywhere. This is what makes a calculator reusable across
-     the whole atlas: add it once to the shared index, and it activates in
-     every existing and future tool that mentions the term. Best-effort,
-     same pattern as CONCEPTS above — nothing breaks if it hasn't loaded or
-     is unreachable, the page just has no calculator trigger yet. */
-  let CALCULATORS = null;
-  fetch("https://satbuhan.github.io/clinical-algorithm-atlas/assets/calculators.json")
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data) => {
-      CALCULATORS = (data && data.calculators) || {};
-      if (currentNodeId) selectNode(currentNodeId);
-    })
-    .catch(() => {
-      CALCULATORS = {};
-    });
-
-  function findCalculatorForTerm(matchText) {
-    if (!CALCULATORS) return null;
-    const norm = matchText.toLowerCase().trim();
-    for (const key in CALCULATORS) {
-      const calc = CALCULATORS[key];
-      if ((calc.aliases || []).some((a) => a.toLowerCase().trim() === norm)) {
-        return calc;
-      }
-    }
-    return null;
-  }
-
-  // A GLOSSARY term's def panel grows a calculator trigger + empty mount
-  // point when the shared index has a calculator aliased to this exact
-  // term. Empty string (nothing rendered) until CALCULATORS loads or if no
-  // calculator matches — same contract as crossLinksHtml above.
-  function calculatorHtml(matchText) {
-    const calc = findCalculatorForTerm(matchText);
-    if (!calc) return "";
-    return (
-      '<button type="button" class="calc-trigger" data-calc="' +
-      calc.id +
-      '">🧮 Open/close ' +
-      escapeHtml(calc.title) +
-      " calculator</button>" +
-      '<div class="calc-mount" id="calc-mount-' +
-      calc.id +
-      '" hidden></div>'
-    );
-  }
-
-  /* ---- calculator rendering ----
-     Generic, data-driven — add a new `calc.type` branch here as future
-     calculator kinds are added (e.g. a weight-based dose formula); never
-     write bespoke per-calculator markup/logic elsewhere. No calculator
-     here ever persists a value anywhere (no localStorage, no module-level
-     cache of entered values) — deliberate, to rule out a value carrying
-     over from one patient to the next. Closing a calculator discards it;
-     reopening always starts blank. */
-  function renderCalculatorInto(mountEl, calc) {
-    const isOpen = !mountEl.hidden;
-    if (isOpen) {
-      mountEl.hidden = true;
-      mountEl.innerHTML = "";
-      return;
-    }
-    mountEl.hidden = false;
-    if (calc.type === "additive-score") {
-      renderAdditiveScoreCalculator(mountEl, calc);
-    } else {
-      mountEl.textContent = "This calculator type isn't supported in this tool build yet.";
-    }
-  }
-
-  function renderAdditiveScoreCalculator(mountEl, calc) {
-    const box = document.createElement("div");
-    box.className = "calc-box";
-
-    // Most items are independent checkboxes (one point value each, any
-    // combination may be checked). An item with kind: "radio" is instead
-    // a mutually-exclusive set of options with its own point values (e.g.
-    // CHA₂DS₂-VASc's age bands: <65 / 65-74 / ≥75 are alternatives, never
-    // cumulative) — rendered as a labelled radio group sharing one unique
-    // `name`, so at most one option in that group can contribute points.
-    // Plain items with no `kind` default to the checkbox behaviour, so
-    // existing calculator entries never need migrating.
-    const list = document.createElement("div");
-    list.className = "calc-items";
-    let idx = 0;
-    calc.items.forEach((item) => {
-      if (item.kind === "radio") {
-        const fs = document.createElement("fieldset");
-        fs.className = "calc-radio-group";
-        const legend = document.createElement("legend");
-        legend.textContent = item.label + (item.needsAuthor ? " *" : "");
-        fs.appendChild(legend);
-        const groupName = "calc-" + calc.id + "-group-" + idx++;
-        item.options.forEach((opt) => {
-          const row = document.createElement("label");
-          row.className = "calc-item calc-item--radio";
-          const rb = document.createElement("input");
-          rb.type = "radio";
-          rb.name = groupName;
-          rb.dataset.points = String(opt.points);
-          row.appendChild(rb);
-          const span = document.createElement("span");
-          span.textContent = opt.label;
-          row.appendChild(span);
-          fs.appendChild(row);
-        });
-        list.appendChild(fs);
-      } else {
-        const row = document.createElement("label");
-        row.className = "calc-item";
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.dataset.points = String(item.points);
-        cb.id = "calc-" + calc.id + "-" + idx++;
-        row.appendChild(cb);
-        const span = document.createElement("span");
-        span.textContent = item.label + (item.needsAuthor ? " *" : "");
-        row.appendChild(span);
-        list.appendChild(row);
-      }
-    });
-    box.appendChild(list);
-
-    const total = document.createElement("p");
-    total.className = "calc-total";
-    function updateTotal() {
-      let sum = 0;
-      list.querySelectorAll("input[type=checkbox]:checked, input[type=radio]:checked").forEach((el) => {
-        sum += Number(el.dataset.points) || 0;
-      });
-      total.textContent = "Total: " + sum + (calc.maxScore ? " / " + calc.maxScore : "");
-    }
-    list.addEventListener("change", updateTotal);
-    updateTotal();
-    box.appendChild(total);
-
-    if (calc.interpretation) {
-      const note = document.createElement("p");
-      note.className = "calc-note";
-      note.textContent = calc.interpretation;
-      box.appendChild(note);
-    }
-    if (calc.items.some((item) => item.needsAuthor)) {
-      const flag = document.createElement("p");
-      flag.className = "calc-flag";
-      flag.textContent =
-        "* Exact threshold wording is ambiguous across sources for this item; flagged for author confirmation.";
-      box.appendChild(flag);
-    }
-    if (calc.source && calc.source.text) {
-      const src = document.createElement("p");
-      src.className = "calc-source";
-      src.innerHTML =
-        escapeHtml(calc.source.text) +
-        (calc.source.url
-          ? ' <a href="' + calc.source.url + '" target="_blank" rel="noopener">' + calc.source.url + "</a>"
-          : "");
-      box.appendChild(src);
-    }
-
-    mountEl.innerHTML = "";
-    mountEl.appendChild(box);
-  }
-
   function linkify(rawText, usedTerms) {
     const text = escapeHtml(rawText);
     let result = "";
@@ -366,23 +194,14 @@
       } else {
         const g = best.g;
         const label = g.full ? g.full[0].toUpperCase() + g.full.slice(1) : "";
-        // A calculator-enabled term gets a small badge right on the button
-        // itself, inline in the running text — the trigger to actually use
-        // it still lives inside the def panel (calculatorHtml below), but
-        // the badge is what makes the opportunity visible before a reader
-        // ever clicks anything, rather than a surprise found only after
-        // opening the definition.
-        const hasCalc = !!findCalculatorForTerm(g.match);
         result +=
           '<button type="button" class="term" aria-expanded="false">' +
           best.text +
-          (hasCalc ? ' <span class="term-calc-badge" aria-hidden="true">🧮</span>' : "") +
           "</button>" +
-          '<span class="term-def" hidden>' +
+          '<span class="term-def" hidden data-term="' + escapeHtml(g.match) + '">' +
           (g.full ? "<strong>" + escapeHtml(label) + "</strong> — " : "") +
           escapeHtml(g.def) +
           crossLinksHtml(g.match) +
-          calculatorHtml(g.match) +
           "</span>";
         usedTerms.add(g.match);
       }
@@ -554,12 +373,8 @@
       }
       return;
     }
-    const calcBtn = e.target.closest(".calc-trigger");
-    if (calcBtn) {
-      const calc = CALCULATORS && CALCULATORS[calcBtn.dataset.calc];
-      const mount = document.getElementById("calc-mount-" + calcBtn.dataset.calc);
-      if (calc && mount) renderCalculatorInto(mount, calc);
-    }
+    // Calculator open/close is handled by the shared calculator-widget.js
+    // (a delegated document-level listener), not here.
   });
 
   readoutClose.addEventListener("click", closeReadout);

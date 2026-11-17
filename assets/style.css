@@ -375,15 +375,6 @@ a { color: var(--accent); }
 }
 .term:hover, .term:focus-visible { background: var(--accent-wash); }
 .term[aria-expanded="true"] { background: var(--accent-wash); border-bottom-style: solid; }
-/* badge on a glossary term that also has a calculator — the visibility
-   signal itself; the actual trigger stays inside .term-def (see
-   .calc-trigger below), this just tells a reader it's worth opening */
-.term-calc-badge {
-  font-size: 0.82em;
-  margin-left: 0.12em;
-  line-height: 1;
-  vertical-align: -0.05em;
-}
 .term-def {
   display: block;
   font-family: var(--font-sans);
@@ -456,83 +447,9 @@ a { color: var(--accent); }
 }
 .refchip:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Calculators — keyword-triggered (see app.js's findCalculatorForTerm);
-   data comes from the shared hub index, never hand-built per tool. */
-.calc-trigger {
-  all: unset;
-  display: inline-block;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--accent);
-  border: 1px solid var(--accent-soft);
-  border-radius: 999px;
-  padding: 0.25rem 0.7rem;
-  margin: 0.5rem 0 0;
-}
-.calc-trigger:hover, .calc-trigger:focus-visible { background: var(--accent-wash); }
-.calc-mount[hidden] { display: none; }
-.calc-box {
-  margin-top: 0.6rem;
-  padding: 0.6rem 0.7rem;
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius-box);
-  background: var(--paper);
-}
-.calc-items { display: flex; flex-direction: column; gap: 0.45rem; }
-.calc-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: var(--ink);
-  cursor: pointer;
-}
-.calc-item input { margin-top: 0.2rem; flex: none; }
-
-/* A mutually-exclusive set of options within one calculator (e.g.
-   CHA₂DS₂-VASc's age bands) — same visual language as a plain checkbox
-   item, just grouped under its own label with a thin rule separating it
-   from neighbouring items. */
-.calc-radio-group {
-  border: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-.calc-radio-group legend {
-  padding: 0 0 0.1rem;
-  font-family: var(--font-sans);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-.calc-item--radio { padding-left: 0.3rem; }
-.calc-total {
-  margin: 0.65rem 0 0;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 0.86rem;
-  color: var(--accent);
-}
-.calc-note, .calc-source {
-  margin: 0.4rem 0 0;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-.calc-flag {
-  margin: 0.4rem 0 0;
-  font-family: var(--font-sans);
-  font-size: 0.74rem;
-  color: var(--alarm);
-}
+/* Calculator styles (.calc-trigger, .calc-box, .term-calc-badge, etc.) now
+   come from the shared calculator-widget.css loaded in index.html, not
+   from here — see that file in the clinical-algorithm-atlas repo. */
 
 .readout__close { display: none; }
 
